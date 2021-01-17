@@ -9,5 +9,5 @@ void setup() {
 }
 
 void loop() {
-   SerialControl::update();
+    SerialControl::update();
 }

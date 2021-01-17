@@ -5,7 +5,7 @@
 #ifndef FANCONTROL_PINOUT_H
 #define FANCONTROL_PINOUT_H
 
-#define     F1BLOCK 2
+#define     F1BLOCK 8
 #define     F2BLOCK 4
 #define     F0PWM 10
 #define     F1PWM 3

@@ -18,7 +18,6 @@ void SerialControl::update() {
             FanControl::fan1Speed = read();
         else
             return;
-
         uint8_t fan2Mode = read();
         if (fan2Mode == 0x55)
             FanControl::fan2Speed = 0xFFFF;
