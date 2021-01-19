@@ -7,6 +7,7 @@
 
 void SerialControl::init() {
     Serial.begin(9600);
+    Serial.println("Connected");
 }
 
 void SerialControl::update() {
