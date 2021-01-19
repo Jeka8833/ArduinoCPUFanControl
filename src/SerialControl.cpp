@@ -7,11 +7,11 @@
 
 void SerialControl::init() {
     Serial.begin(9600);
-    Serial.println("Connected");
 }
 
 void SerialControl::update() {
-    if (read() == 0xC0) {
+    uint8_t command = read();
+    if (command == 0xA0) {
         uint8_t fan1Mode = read();
         if (fan1Mode == 0x55)
             FanControl::fan1Speed = 0xFFFF;
@@ -29,6 +29,8 @@ void SerialControl::update() {
 
         FanControl::fan0Speed = read();
         FanControl::update();
+        Serial.write(0xFF);
+    } else if (command == 0x50) {
         Serial.write(0xFF);
     }
 }
