@@ -5,6 +5,7 @@
 void setup() {
     SerialControl::init();
     FanControl::init();
+    FanControl::update();
 }
 
 void loop() {
