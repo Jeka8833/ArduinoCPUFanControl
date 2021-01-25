@@ -5,38 +5,57 @@
 #include "SerialControl.h"
 #include "FanControl.h"
 
+#define HEADER 0xAA
+#define SET_SPEED_MODE 0x01
+#define IDLE 0xFF
+#define WAIT_CHECKSUM 0xEF
+
+
+uint8_t lenAndSum;
+uint8_t *data;
+uint8_t position = IDLE;
+uint8_t checksum;
+
+
 void SerialControl::init() {
     Serial.begin(9600);
 }
 
 void SerialControl::update() {
-    uint8_t command = read();
-    if (command == 0xA0) {
-        uint8_t fan1Mode = read();
-        if (fan1Mode == 0x55)
-            FanControl::fan1Speed = 0xFFFF;
-        else if (fan1Mode == 0xCC)
-            FanControl::fan1Speed = read();
-        else
-            return;
-        uint8_t fan2Mode = read();
-        if (fan2Mode == 0x55)
-            FanControl::fan2Speed = 0xFFFF;
-        else if (fan2Mode == 0xCC)
-            FanControl::fan2Speed = read();
-        else
-            return;
-
-        FanControl::fan0Speed = read();
-        FanControl::update();
-        Serial.write(0xFF);
-    } else if (command == 0x50) {
-        Serial.write(0xFF);
+    while (Serial.available()) {
+        uint8_t receivedByte = Serial.read();
+        switch (position) {
+            case IDLE:
+                if (receivedByte == HEADER)
+                    position = WAIT_CHECKSUM;
+                break;
+            case WAIT_CHECKSUM:
+                lenAndSum = receivedByte;
+                data = new uint8_t[(receivedByte & 0xF0) >> 4];
+                position = 0;
+                checksum = 0;
+                break;
+            default:
+                data[position++] = receivedByte;
+                checksum += receivedByte;
+                if (position >= ((lenAndSum & 0xF0) >> 4)) {
+                    if ((((checksum & 0x0F) ^ ((checksum & 0xF0) >> 4)) & 0x0F) == (lenAndSum & 0x0F)) {
+                        decode(data, (receivedByte & 0xF0) >> 4);
+                        Serial.write(0xFF);
+                    }
+                    delete data;
+                    position = IDLE;
+                }
+                break;
+        }
     }
 }
 
-uint8_t SerialControl::read() {
-    while (!Serial.available()) {
+void SerialControl::decode(uint8_t *array, uint_least8_t len) {
+    if (array[0] == SET_SPEED_MODE) {
+        FanControl::setSpeed(FAN0, (array[1] << 8) + array[2]);
+        FanControl::setSpeed(FAN1, (array[3] << 8) + array[4]);
+        FanControl::setSpeed(FAN2, (array[5] << 8) + array[6]);
+        FanControl::setTimeSpin((array[7] << 8) + array[8]);
     }
-    return Serial.read();
 }

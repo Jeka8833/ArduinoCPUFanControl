@@ -10,10 +10,11 @@
 class SerialControl {
 public:
     static void init();
+
     static void update();
 
 private:
-    static uint8_t read();
+    static void decode(uint8_t array[], uint_least8_t len);
 };
 
 
