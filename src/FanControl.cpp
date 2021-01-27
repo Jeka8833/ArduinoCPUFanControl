@@ -7,11 +7,11 @@
 uint32_t FanControl::lastTime = 0;
 uint16_t FanControl::timeFullSpin = 0;
 
-uint16_t FanControl::fan0Speed = 0x0020;
+uint16_t FanControl::fan0Speed = 0x0050;
 uint16_t FanControl::fan1Speed = 0xFFFF;
 uint16_t FanControl::fan2Speed = 0xFFFF;
 
-uint16_t FanControl::fan0LastSpeed = 0x0020;
+uint16_t FanControl::fan0LastSpeed = 0x0050;
 uint16_t FanControl::fan1LastSpeed = 0xFFFF;
 uint16_t FanControl::fan2LastSpeed = 0xFFFF;
 
